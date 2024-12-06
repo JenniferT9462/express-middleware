@@ -12,7 +12,10 @@ app.use((req, res, next) => {
     console.log(req.method, req.hostname, req.path, req.time); //Output: GET localhost / Thu Dec 05 2024 21:24:24 GMT-0600 (Central Standard Time) 'method hostname path time'
     next();
 });
-
+const logHeaders = ((req, res, next) => {
+    console.log("Request Headers:", req.headers);
+    next();
+})
 //express-rate-limit middleware
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, //Per minute
@@ -26,6 +29,8 @@ const limiter = rateLimit({
 
 })
 
+//Use logHeaders middleware function
+app.use(logHeaders);
 //Use rateLimit - before handlers - Only for '/data' path
 app.use('/data', limiter);
 
