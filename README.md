@@ -44,7 +44,7 @@ A guide to building a simple Express app that has custom middleware that logs re
         res.send("Welcome to Express Middleware!")
     })
 
-* To start the server you need to add this to the server.js file at the bottom:
+* To start the server you need to add this to the `index.js` file at the bottom:
     ```js
     //Start the server
     app.listen(3000, () => {
