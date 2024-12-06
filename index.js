@@ -26,16 +26,21 @@ const limiter = rateLimit({
 
 })
 
-//Use rateLimit - before handlers
-app.use(limiter);
+//Use rateLimit - before handlers - Only for '/data' path
+app.use('/data', limiter);
 
 app.get('/', (req, res) => {
     res.send("Welcome to Express Middleware!")
 })
 
-// app.get('/rateLimit', (req, res) => {
-//     res.send("Express Rate Limit");
-// })
+//Post handler
+app.post('/data', (req, res) => {
+    const { name } = req.body;
+    res.json({
+        message: `Hello, ${name}!`,
+        success: true,
+    });
+ });
 
 
  //Start the server
