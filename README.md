@@ -71,7 +71,7 @@ Middleware in Express.js are functions that have access to the request object (r
 * Export the middleware function to be used in `index.js`:
     ```js
     export { detailLogger }
-* Import the middleware function to `index.js` file:
+* Import the middleware function in the `index.js` file:
     ```js
     import { detailLogger } from './middleware/details.js';
 * Use the middleware in `index.js`:
@@ -123,7 +123,7 @@ Middleware in Express.js are functions that have access to the request object (r
             success: true,
         });
     });
-* Import the `limiter` middleware function to `index.js`:
+* Import the `limiter` middleware function in `index.js` file:
     ```js
     import { limiter } from './middleware/limiter.js';
 * Use the limiter middleware in the `index.js` file. For this guide I will be only using it for the `/data` path:
