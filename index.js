@@ -2,14 +2,14 @@ import express from 'express';
 const app = express();
 
 import { detailLogger } from './middleware/details.js';
-import { logHeaders } from './middleware/logHeaders.js';
 import { limiter } from './middleware/limiter.js';
+import { logHeaders } from './middleware/logHeaders.js';
 
 //JSON Middleware - to parse JSON responses
 app.use(express.json());
 
 //Use detailLogger
-app.use(detailLogger)
+app.use(detailLogger);
 //Use logHeaders middleware function
 app.use(logHeaders);
 //Use rateLimit - before handlers - Only for '/data' path

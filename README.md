@@ -55,17 +55,29 @@ A guide to building a simple Express app that has custom middleware that logs re
 
 Middleware in Express.js are functions that have access to the request object (req), the response object (res), and the next middleware function in the application's request-response cycle. The next middleware function is commonly denoted by a variable named `next()`.
 
-### Custom Middleware
+* Create a folder named `middleware`. 
 
+### Custom Middleware
+* In the `middleware` folder create a file named `details.js`. 
 * Create a simple logger middleware function. The function will log the `method`, `hostname`, `path` and `time` about each incoming request:
 
     ```js
-    app.use((req,res,next) =>{
-        req.time = new Date(Date.now()).toString();
-        console.log(req.method,req.hostname, req.path, req.time);
+    //Custom Middleware that logs incoming request
+    const detailLogger = ((req, res, next) => {
+        req.time = new Date(Date.now()).toString(); //Current time
+        console.log(req.method, req.hostname, req.path, req.time); //Output: GET localhost / Thu Dec 05 2024 21:24:24 GMT-0600 (Central Standard Time) 'method hostname path time'
         next();
     });
-
+* Export the middleware function to be used in `index.js`:
+    ```js
+    export { detailLogger }
+* Import the middleware function to `index.js` file:
+    ```js
+    import { detailLogger } from './middleware/details.js';
+* Use the middleware in `index.js`:
+    ```js
+    //Use detailLogger
+    app.use(detailLogger);
 * Example output: GET localhost / Thu Dec 05 2024 22:11:35 GMT-0600 (Central Standard Time)   
 * Place middleware function above all routes.
 
@@ -73,25 +85,13 @@ Middleware in Express.js are functions that have access to the request object (r
 
 * For this guide I will be using `express-rate-limit`. To use this you have to install by running:
 
-    ```js
+    ```bash
     npm install express-rate-limit
-
-* Import `rateLimit`:
-
+* In the `middleware` folder create a new file named `limiter.js`.
+* In the `limiter.js` file import `rateLimit`:
     ```js
     import { rateLimit } from 'express-rate-limit'
-* Make a new route with a path `/data` with a `POST` request:
-    -  This will go below the middleware functions.
-    ```js
-    //Post handler
-    app.post('/data', (req, res) => {
-        const { name } = req.body;
-        res.json({
-            message: `Hello, ${name}!`,
-            success: true,
-        });
-    });
- 
+
 * Modify the server to use express-rate-limit to limit requests to 3 per minute:
        
     ```js
@@ -109,8 +109,24 @@ Middleware in Express.js are functions that have access to the request object (r
          // Standard now to set false, also related to headers
         legacyHeaders: false,.
     });
-
-* Use the limiter middleware. For this guide I will be only using it for the `/data` path:
+* Export the limiter middleware function:
+    ```js
+    export { limiter };
+* Make a new route with a path `/data` with a `POST` request:
+    -  This will go below the middleware functions in the `index.js` file.
+    ```js
+   //Post handler
+    app.post('/data', (req, res) => {
+        const { name } = req.body;
+        res.json({
+            message: `Hello, ${name}!`,
+            success: true,
+        });
+    });
+* Import the `limiter` middleware function to `index.js`:
+    ```js
+    import { limiter } from './middleware/limiter.js';
+* Use the limiter middleware in the `index.js` file. For this guide I will be only using it for the `/data` path:
 
     ```js
     //Use rateLimit - before handlers - Only for '/data' path
@@ -118,6 +134,43 @@ Middleware in Express.js are functions that have access to the request object (r
 
 * Make sure you put the use code before routes and after the middleware function.
 
+### Custom Middleware - Logs headers
+* Create a new file named `logHeaders.js` in the `middleware` folder.
+* Create another custom middleware function that logs request headers or other information from the request such as params or query data. In this guide I am logging the headers:
+
+    ```js
+    //Custom Middleware that logs headers
+    const logHeaders = ((req, res, next) => {
+        console.log("Request Headers:", req.headers);
+        next();
+    })
+* Export the middleware function:
+    ```js
+    export { logHeaders };
+* Import the `logHeaders` middleware function in `index.js`:
+    ```js
+    import { logHeaders } from './middleware/logHeaders.js';
+* Use the middleware in the `index.js` file:
+    ```js
+    //Use logHeaders middleware function
+    app.use(logHeaders);
+* Example Output:
+    ```bash
+    Request Headers: {
+        host: 'localhost:3000',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0',
+        accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'accept-language': 'en-US,en;q=0.5',        
+        'accept-encoding': 'gzip, deflate, br, zstd',
+        connection: 'keep-alive',
+        'upgrade-insecure-requests': '1',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'none',
+        'sec-fetch-user': '?1',
+        'if-none-match': 'W/"1e-oNy6j1Is6dCkgECvLRFAzeYd/lk"',
+        priority: 'u=0, i'
+    }
 ## Testing
 
 ### Nodemon
