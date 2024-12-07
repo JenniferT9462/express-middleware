@@ -1,39 +1,22 @@
 import express from 'express';
 const app = express();
-//import third-party middleware
-import { rateLimit } from 'express-rate-limit';
+
+import { detailLogger } from './middleware/details.js';
+import { logHeaders } from './middleware/logHeaders.js';
+import { limiter } from './middleware/limiter.js';
 
 //JSON Middleware - to parse JSON responses
 app.use(express.json());
 
-//Custom Middleware that logs incoming request
-app.use((req, res, next) => {
-    req.time = new Date(Date.now()).toString(); //Current time
-    console.log(req.method, req.hostname, req.path, req.time); //Output: GET localhost / Thu Dec 05 2024 21:24:24 GMT-0600 (Central Standard Time) 'method hostname path time'
-    next();
-});
-const logHeaders = ((req, res, next) => {
-    console.log("Request Headers:", req.headers);
-    next();
-})
-//express-rate-limit middleware
-const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, //Per minute
-    max: 3, //Max 3 requests per 1 minute
-    message: {
-        status: 429,
-        error: "Too many, requests, please try again later."
-    }, //Displays JSON when reached limit
-    standardHeaders: 'draft-7', //This enables 'rateLimit' in the headers, 'draft-7' is the latest.
-    legacyHeaders: false, //It is standard now to make false, also to do with headers.
-
-})
-
+//Use detailLogger
+app.use(detailLogger)
 //Use logHeaders middleware function
 app.use(logHeaders);
 //Use rateLimit - before handlers - Only for '/data' path
 app.use('/data', limiter);
 
+
+//Routes
 app.get('/', (req, res) => {
     res.send("Welcome to Express Middleware!")
 })
